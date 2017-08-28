@@ -112,7 +112,10 @@ public class MineDonate {
     	return m_DB_Connection ;
     	
     }
-    
+
+    public static DBWorker db_worker;
+    public static Thread db_worker_thread;
+
     @SideOnly(Side.SERVER)
     public static void initDataBase ( ) {
 
@@ -122,7 +125,11 @@ public class MineDonate {
 
             Class . forName ( "com.mysql.jdbc.Driver" ) . newInstance ( ) ;
             m_DB_Connection = DriverManager . getConnection("jdbc:mysql://" + cfg.dbHost + ":" + cfg.dbPort + "/" + cfg.dbName, cfg.dbUser, cfg.dbPassword ) ;
-
+            db_worker = new DBWorker(1, cfg);
+            db_worker_thread = new  Thread(db_worker);
+            db_worker_thread.start();
+            
+            
             MinecraftServer.getServer().logInfo("Connected!");
 
             loadServerMerch ( ) ;
@@ -196,7 +203,7 @@ public class MineDonate {
         
     }
     
-	public static boolean checkShopExists ( int shopId ) {
+	public static boolean checkShopExists(int shopId) {
 
 		return shops . containsKey ( shopId ) ;
     	
@@ -204,11 +211,11 @@ public class MineDonate {
 	
 	public static boolean checkShopAndLoad ( int shopId ) {
 
-		if ( ! checkShopExists ( shopId ) ) {
+		if ( ! checkShopExists ( shopId) ) {
 			
 			loadUserShop ( shopId ) ;
-			return checkShopExists ( shopId ) ;
-			
+			return checkShopExists ( shopId) ;
+
 		} else {
 			
 			return true ;
@@ -219,7 +226,7 @@ public class MineDonate {
 	
 	public static boolean checkCatExists ( int shopId, int catId ) {
 
-		return ( checkShopExists ( shopId ) ? shops . get ( shopId ) . cats . length > catId : false ) ;
+		return ( checkShopExists ( shopId) ? shops . get ( shopId ) . cats . length > catId : false ) ;
     	
 	}
 

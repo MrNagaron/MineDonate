@@ -17,6 +17,7 @@ import ru.alastar.minedonate.network.manage.packets.EditMerchStringPacket;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -245,7 +246,7 @@ public class Manager {
 	}
 
 
-	public static void addEntityToShop ( Account acc, Shop s, int catId, int limit, int cost, String name ) {
+	public static void addEntityToShop(Account acc, Shop s, int catId, int limit, int cost, String name, Connection conn) {
 		
 		if ( ! acc . canUnlimitedEntities ( ) ) {
 			
@@ -267,7 +268,7 @@ public class Manager {
             
             InputStream stream = new ByteArrayInputStream(buf.array());
         
-            PreparedStatement statement = MineDonate.getDBConnection().prepareStatement("INSERT INTO " + s.cats[catId].getDatabaseTable() + " (name, data, cost, lim) VALUES(?,?,?,?)");
+            PreparedStatement statement = conn.prepareStatement("INSERT INTO " + s.cats[catId].getDatabaseTable() + " (name, data, cost, lim) VALUES(?,?,?,?)");
             
             statement.setString(1, name);
             statement.setBlob(2, stream);
@@ -285,7 +286,7 @@ public class Manager {
         
 	}
 	
-	public static void addItemToShop ( Account acc, Shop s, int catId, int limit, int cost, String name ) {
+	public static void addItemToShop(Account acc, Shop s, int catId, int limit, int cost, String name, Connection conn) {
 		
 		if ( ! acc . canUnlimitedItems ( ) ) {
 			
@@ -315,11 +316,11 @@ public class Manager {
             
             if ( s . sid == 0 ) {
             
-            	statement = MineDonate.getDBConnection().prepareStatement("INSERT INTO " + s.cats[catId].getDatabaseTable() + " (name, cost, lim, stack_data) VALUES(?,?,?,?)");
+            	statement = conn.prepareStatement("INSERT INTO " + s.cats[catId].getDatabaseTable() + " (name, cost, lim, stack_data) VALUES(?,?,?,?)");
             
             } else {
          
-            	statement = MineDonate.getDBConnection().prepareStatement("INSERT INTO " + s.cats[catId].getDatabaseTable() + " (name, cost, lim, stack_data, shopId) VALUES(?,?,?,?,?)");
+            	statement = conn.prepareStatement("INSERT INTO " + s.cats[catId].getDatabaseTable() + " (name, cost, lim, stack_data, shopId) VALUES(?,?,?,?,?)");
                 statement.setInt(5, s.sid);
 
             }
